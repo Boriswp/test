@@ -19,7 +19,7 @@
         <ImageView
             android:id="@+id/pictures"
             android:layout_width="match_parent"
-            android:layout_height="314dp"></ImageView>
+            android:layout_height="350dp"></ImageView>
 
         <TextView
             android:id="@+id/DiscriptionText"
@@ -28,6 +28,7 @@
             android:gravity="center_vertical"
             android:minHeight="40dp"
             android:text="this is very funny story"
-            android:textSize="20sp"></TextView>
+            android:textSize="20sp"
+            android:paddingTop="10dp"></TextView>
     </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

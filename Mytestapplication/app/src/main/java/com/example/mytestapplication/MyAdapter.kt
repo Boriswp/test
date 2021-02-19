@@ -7,15 +7,16 @@ import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.activity.viewModels
 
 
 class MyAdapter : BaseAdapter
 {
     private lateinit var description:Array<String>
     private lateinit var titles: Array<String>
-    lateinit var images:Array<Bitmap>
+    var images:Array<Bitmap>
     private var mContext: Context? = null
-    private lateinit var Id:Array<Int>
+    private var Id:Array<Int>
     constructor(context: Context,desc:Array<String>,title:Array<String>,image:Array<Bitmap>,ids:Array<Int>){
         description=desc
         titles=title
@@ -23,12 +24,15 @@ class MyAdapter : BaseAdapter
         Id=ids
         mContext=context
     }
-    public fun UpdateData(context: Context,desc:Array<String>,title:Array<String>,image:Array<Bitmap>,ids:Array<Int>){
+    fun UpdateData(context: Context,desc:Array<String>,title:Array<String>,image:Array<Bitmap>,ids:Array<Int>){
         description=desc
         titles=title
         images=image
         Id=ids
         mContext=context
+    }
+    fun UpdateImage(image:Array<Bitmap>){
+        images=image
     }
     override fun getView(position: Int, convertView: View?, parent: ViewGroup): View {
         var grid: View

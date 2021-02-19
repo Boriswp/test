@@ -5,13 +5,9 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.util.Log
 import android.widget.GridView
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
+import androidx.activity.viewModels
+import androidx.lifecycle.*
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.android.awaitFrame
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.launch
 import org.json.JSONArray
 import java.io.BufferedReader
@@ -22,6 +18,7 @@ import java.net.URL
 
 class GetContent:ViewModel() {
     val stringContent=MutableLiveData<JSONArray>()
+    val ImageContent=MutableLiveData<Bitmap>()
     fun requestData(
         count: Int
     ): LiveData<JSONArray> { viewModelScope.launch(Dispatchers.IO) {
@@ -38,12 +35,15 @@ class GetContent:ViewModel() {
     }
         return stringContent
     }
+
     fun DownloadAndCreateImage(url:Array<String>,bitmapArray:Array<Bitmap>,num:Int) {
         viewModelScope.launch(Dispatchers.IO) {
-            for (n in num until url.size){
+            for (n in num until url.size) {
                 val getBits = URL(url[n]).openStream()
-                bitmapArray[n]=BitmapFactory.decodeStream(getBits)
+                bitmapArray[n] = BitmapFactory.decodeStream(getBits)
+                Log.d("image",url[n])
             }
         }
     }
 }
+

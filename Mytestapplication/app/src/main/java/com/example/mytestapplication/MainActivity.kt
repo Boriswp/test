@@ -9,12 +9,16 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.graphics.createBitmap
 import androidx.recyclerview.widget.RecyclerView
+import kotlinx.coroutines.Dispatchers
 import org.json.JSONObject
 import java.util.logging.Handler
 
 
 class MainActivity : AppCompatActivity() {
     var hasCreate=false
+    var end=false
+    var updating=false
+    lateinit var bitmap:Bitmap
     lateinit var adapter:MyAdapter
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -23,7 +27,7 @@ class MainActivity : AppCompatActivity() {
         var numOfContent=10
         var count=0
         var Id=Array(numOfContent) {0}
-        var bitmap= createBitmap(1,1)
+         bitmap= createBitmap(1,1)
         var MainTextObj= Array(numOfContent) {""}
         var DiscriptiontextOb= Array(numOfContent) {""}
         var bitmapArray= Array(numOfContent) {bitmap}
@@ -31,21 +35,37 @@ class MainActivity : AppCompatActivity() {
         createContent(gvMain,count,url,bitmapArray,MainTextObj,DiscriptiontextOb,Id)
         gvMain.setOnScrollListener(object : AbsListView.OnScrollListener {
                 override fun onScroll(view: AbsListView?, firstVisibleItem: Int, visibleItemCount: Int, totalItemCount: Int) {
-                    if (visibleItemCount + firstVisibleItem == totalItemCount&&hasCreate) {
-                        url += Array(numOfContent) { "" }
-                        Id+=Array(numOfContent) {0}
-                        MainTextObj += Array(numOfContent) { "" }
-                        DiscriptiontextOb += Array(numOfContent) { "" }
-                        bitmapArray += Array(numOfContent) { bitmap }
-                        count+=numOfContent
-                        createContent(gvMain,count,url,bitmapArray,MainTextObj,DiscriptiontextOb,Id)
+                    if(hasCreate) {
+                        if (visibleItemCount + firstVisibleItem == totalItemCount && !end) {
+                            url += Array(numOfContent) { "" }
+                            Id += Array(numOfContent) { 0 }
+                            MainTextObj += Array(numOfContent) { "" }
+                            DiscriptiontextOb += Array(numOfContent) { "" }
+                            bitmapArray += Array(numOfContent) { bitmap }
+                            count += numOfContent
+                            Log.d("count",count.toString())
+                            createContent(gvMain, count, url, bitmapArray, MainTextObj, DiscriptiontextOb, Id)
+                        }
+                        if(end&&!updating) {
+                            updating=true
+                            val model: GetContent by viewModels()
+                            model.DownloadAndCreateImage(url, bitmapArray,0)
+                        }
                     }
                 }
 
             override fun onScrollStateChanged(view: AbsListView?, scrollState: Int) {
                 when (scrollState) {
-                    RecyclerView.SCROLL_STATE_IDLE -> println("The RecyclerView is not scrolling")
-                    RecyclerView.SCROLL_STATE_DRAGGING -> println("Scrolling now")
+                    RecyclerView.SCROLL_STATE_IDLE ->{
+                        if(hasCreate) {
+                            adapter.UpdateImage(bitmapArray)
+                            adapter.notifyDataSetChanged()
+                        }
+                        println("The RecyclerView is not scrolling")}
+                    RecyclerView.SCROLL_STATE_DRAGGING ->{
+                        if(hasCreate)
+                          adapter.UpdateImage(bitmapArray)
+                        println("Scrolling now")}
                     RecyclerView.SCROLL_STATE_SETTLING -> println("Scroll Settling")
                 }
             }
@@ -78,12 +98,12 @@ class MainActivity : AppCompatActivity() {
                     hasCreate = true
                 }
                 else {
-                    adapter.UpdateData(this, DiscriptiontextOb, MainTextObj, bitmapArray, Id)
+                    adapter.UpdateData(this, DiscriptiontextOb, MainTextObj,bitmapArray, Id)
                     adapter.notifyDataSetChanged()
                 }
             }
             else
-                hasCreate=false
+                end=true
         })
     }
 }
