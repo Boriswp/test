@@ -24,7 +24,7 @@ class MyAdapter : BaseAdapter
         Id=ids
         mContext=context
     }
-    fun UpdateData(context: Context,desc:Array<String>,title:Array<String>,image:Array<Bitmap>,ids:Array<Int>){
+    fun UpdateData(context:Context,desc:Array<String>,title:Array<String>,image:Array<Bitmap>,ids:Array<Int>){
         description=desc
         titles=title
         images=image
