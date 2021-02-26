@@ -68,36 +68,35 @@ class MainActivity : AppCompatActivity() {
 
     private suspend fun createContent(gvMain:GridView, model: GetContent, num:Int, url: Array<String>, bitmapArray: Array<Bitmap>, MainTextObj: Array<String>
                                       , DiscriptiontextOb: Array<String>, Id:Array<Int>) {
-        val job: Job =GlobalScope.launch {
-            var ob=model.requestData(num)
-            Log.d("Json",ob.toString())
-            if (ob != null&&ob.toString()!="[]") {
-                var textOb: String
-                for (n in 0 until ob.length()) {
-                    textOb = ob.getJSONObject(n)["name"].toString() + "\n"
-                    MainTextObj[n+num] = textOb
-                    var desObj = ob.getJSONObject(n)["description"]
-                    if (desObj.toString().contentEquals("null") || desObj.toString().isEmpty()) {
-                        desObj = " отсутствует"
-                    }
-                    DiscriptiontextOb[n+num] = "Описание:${desObj}\n"
+            val job: Job = GlobalScope.launch {
+                var ob =model.requestData(num)
+                Log.d("Json", ob.toString())
+                if (ob != null && ob.toString() != "[]") {
+                    var textOb: String
+                    for (n in 0 until ob.length()) {
+                        textOb = ob.getJSONObject(n)["name"].toString() + "\n"
+                        MainTextObj[n + num] = textOb
+                        var desObj = ob.getJSONObject(n)["description"]
+                        if (desObj.toString().contentEquals("null") || desObj.toString().isEmpty()) {
+                            desObj = " отсутствует"
+                        }
+                        DiscriptiontextOb[n + num] = "Описание:${desObj}\n"
 
-                    var urlOb = ob.getJSONObject(n)["last_issue"] as JSONObject
-                    url[n+num] = urlOb.getString("cover")
+                        var urlOb = ob.getJSONObject(n)["last_issue"] as JSONObject
+                        url[n + num] = urlOb.getString("cover")
+                    }
+                    Log.d("num", num.toString())
+                    model.DownloadAndCreateImage(url, bitmapArray, num)
+                    needUpdate = true
+                } else {
+                    end = true
+                    needUpdate = false
                 }
-                Log.d("num",num.toString())
-                model.DownloadAndCreateImage(url, bitmapArray,num)
-                needUpdate=true
             }
-            else {
-                end = true
-                needUpdate=false
+            job.join()
+            if (!end) {
+                adapter.UpdateData(this, DiscriptiontextOb, MainTextObj, bitmapArray, Id)
+                adapter.notifyDataSetChanged()
             }
-        }
-        job.join()
-        if(!end) {
-            adapter.UpdateData(this, DiscriptiontextOb, MainTextObj, bitmapArray, Id)
-            adapter.notifyDataSetChanged()
-        }
         }
     }

@@ -16,16 +16,19 @@ import java.net.URL
 class GetContent:ViewModel() {
     val stringContent=MutableLiveData<JSONArray>()
         suspend fun requestData(count: Int):JSONArray {
-            var json:JSONArray
+            var json=JSONArray()
           withContext(Dispatchers.IO) {
-        val url = URL("http://pressa-api.imb2bs.com/api/v1/journal/categories/0/?offset=$count&limit=10")
-        val connection = url.openConnection() as HttpURLConnection
-        connection.doInput = true;
-        connection.setRequestProperty("Project-Id", "2")
-        connection.setRequestProperty("Language", "ru")
-        val inputStream: InputStream = connection.inputStream
-        val allText = inputStream.bufferedReader().use(BufferedReader::readText)
-         json = JSONArray(allText)
+              val url = URL("http://pressa-api.imb2bs.com/api/v1/journal/categories/0/?offset=$count&limit=10")
+              val connection = url.openConnection() as HttpURLConnection
+              connection.doInput = true;
+              connection.setRequestProperty("Project-Id", "2")
+              connection.setRequestProperty("Language", "ru")
+              if(connection.responseCode!=200) {
+                  return@withContext
+              }
+              val inputStream: InputStream = connection.inputStream
+              val allText = inputStream.bufferedReader().use(BufferedReader::readText)
+              json = JSONArray(allText)
             }
             return json
         }
